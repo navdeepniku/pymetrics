@@ -1,4 +1,4 @@
-#This project has python based client-server implementation for metrics collection from remote servers
+This project has python based client-server implementation for metrics collection from remote servers
 
 Prerequisites/Assumptions for the setup:
 
