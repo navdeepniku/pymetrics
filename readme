@@ -1,0 +1,46 @@
+#This project has python based client-server implementation for metrics collection from remote servers
+
+Prerequisites/Assumptions for the setup:
+
+1. Client servers have Python and 'virtualenv' installed at /usr/bin (This is default for most of the servers on AWS ec2)
+2. Configured system user should have permission to at least write to /tmp/ and execute /usr/bin/ scripts
+3. Windows users: emulated ssh by openssh, should have Python and virtualenv installed in the Linux style file system path at /usr/bin/
+4. I have added additional support for Mac clients for virtualenv path /usr/local/bin/
+
+Features:
+
+1. Required hosts and alert types can be set into server_config.xml
+2. For scaling to new alert types, add alert computing logic in client class "MetricsFormulae" and specify the same function name in server_config.xml
+3. For security, the setup uses a new AES key for each client to safeguard if single client machine gets compromised
+
+How do I get Started:
+
+1. Configure required credentials in config.py
+    a. SMTP credentials
+    b. MySQL credentials
+2. Run Database script in db_model.sql
+3. Make sure prerequisites are met (python installed, virtualenv in /usr/bin on client)
+4. Configure server_config.xml
+5. run server.py
+
+
+Workflow:
+
+1. Read server_config.xml for latest hosts and alerts
+2. Every host can be configured to have different types of alerts [eg. for host A (uptime, cpu) for host B (mem, cpu)]
+3. Read xml clients and alerts in models class
+4. For each client start a parallel thread for metrics pull
+5. Initialise paramiko and get ssh,sftp connection for client
+6. Create remote directory ‘/tmp/remotedir/’ and copy client script by sftp
+7. Prepare remote python environment and install dependencies for client script (this is a one time overhead needed because most servers do not allow installing new python packages in default python env if user is not root, next execution will use already created virtualenv)
+8. Execute client script with following parameters:
+        a. Metrics required for this client as configured in server_config
+        b. AES key to encrypt metrics from client to server (In this case the channel is already encrypted by secure shell but, AES encryption can be useful if metrics is sent to any listening socket at server)
+9. Collect and decrypt returned metrics from the client
+10. Write results to a MySQL db with IP, timestamp of the metrics when collected and metrics data (db_model.sql)
+11. If alert_type has value more than threshold send mail to the configured user (have used AWS ses SMTP server)
+
+Pitfalls:
+
+1. Setup uses cross-platform utility psutil to compute system level metrics
+2. No event logs analysed for windows server (win32api can be used to collect event logs)

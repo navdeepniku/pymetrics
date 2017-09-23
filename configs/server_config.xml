@@ -1,0 +1,11 @@
+<clients>
+    <client ip="127.0.0.1" port="22" username="navdeep" password="navdeep@p" mail="navdeepniku@gmail.com">
+        <alert type="mem_percent" limit="50%"/>
+        <alert type="cpu_percent" limit="20%"/>
+    </client>
+    <client ip="192.168.56.102" port="22" username="root" password="spark" mail="navdeepniku@live.com">
+        <alert type="mem_percent" limit="20%"/>
+        <alert type="cpu_percent" limit="10%"/>
+        <alert type="uptime" limit="None"/>
+    </client>
+</clients>
